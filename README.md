@@ -1,5 +1,9 @@
 # 🧬 Stem Cell Regeneration Simulator
 
+<p align="center">
+  <img src="logo.png" alt="Stem Cell Regeneration Simulator Logo" width="280"/>
+</p>
+
 > A Python-based simulation that models stem cell regeneration dynamics, including self-renewal, differentiation, and cell aging. This educational tool visualizes how stem cell populations maintain and regenerate specialized cell types over time.
 
 ---
