@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stem Cell Regeneration Simulator | Cherry Computer Ltd.</title>
+  <meta name="description" content="Interactive stem cell regeneration simulator — visualise population dynamics, differentiation, apoptosis and more. Created by Cherry Computer Ltd." />
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ───────────────── FLOATING PARTICLES ───────────────── -->
+<div class="particles" id="particles"></div>
+
+<!-- ───────────────── HEADER ───────────────── -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo-group">
+      <div class="logo-icon">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="22" stroke="url(#lg1)" stroke-width="2.5"/>
+          <circle cx="24" cy="14" r="5" fill="#4FC3F7" opacity="0.9"/>
+          <circle cx="14" cy="30" r="5" fill="#FF8A65" opacity="0.9"/>
+          <circle cx="34" cy="30" r="5" fill="#69F0AE" opacity="0.9"/>
+          <line x1="24" y1="19" x2="14" y2="25" stroke="#4FC3F7" stroke-width="1.5" opacity="0.6"/>
+          <line x1="24" y1="19" x2="34" y2="25" stroke="#69F0AE" stroke-width="1.5" opacity="0.6"/>
+          <line x1="14" y1="30" x2="34" y2="30" stroke="#FF8A65" stroke-width="1.2" opacity="0.4"/>
+          <defs>
+            <linearGradient id="lg1" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#4FC3F7"/>
+              <stop offset="1" stop-color="#69F0AE"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-title">StemCell<span class="accent">Sim</span></span>
+        <span class="logo-sub">by Cherry Computer Ltd.</span>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="#simulator">Simulator</a>
+      <a href="#biology">Biology</a>
+      <a href="#about">About</a>
+      <a href="https://github.com/Infinite-Networker/Stem-Cell-Regeneration-Simulator" target="_blank" class="btn-nav">GitHub ↗</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ───────────────── HERO ───────────────── -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">🧬 v2.0 — Powered by Cherry Computer Ltd.</div>
+    <h1 class="hero-title">
+      Stem Cell<br/>
+      <span class="gradient-text">Regeneration</span><br/>
+      Simulator
+    </h1>
+    <p class="hero-desc">
+      Model stem cell self-renewal, differentiation, apoptosis and population
+      dynamics with real-time interactive visualisations. Adjust parameters
+      on the fly and explore the science of regenerative medicine.
+    </p>
+    <div class="hero-ctas">
+      <a href="#simulator" class="btn-primary">Launch Simulator →</a>
+      <a href="#biology" class="btn-ghost">Learn the Biology</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <canvas id="heroCanvas" width="480" height="380"></canvas>
+  </div>
+</section>
+
+<!-- ───────────────── STATS BAR ───────────────── -->
+<div class="stats-bar">
+  <div class="stat-item"><span class="stat-num" id="stat-cycles">0</span><span class="stat-label">Cycles Run</span></div>
+  <div class="stat-item"><span class="stat-num" id="stat-stem">0</span><span class="stat-label">Stem Cells</span></div>
+  <div class="stat-item"><span class="stat-num" id="stat-spec">0</span><span class="stat-label">Specialised</span></div>
+  <div class="stat-item"><span class="stat-num" id="stat-dead">0</span><span class="stat-label">Total Deaths</span></div>
+  <div class="stat-item"><span class="stat-num" id="stat-ratio">—</span><span class="stat-label">Diff. Ratio</span></div>
+</div>
+
+<!-- ───────────────── SIMULATOR ───────────────── -->
+<section class="simulator-section" id="simulator">
+  <div class="section-header">
+    <h2>Interactive Simulator</h2>
+    <p>Tune the biological parameters and run the simulation in real time.</p>
+  </div>
+
+  <div class="sim-layout">
+
+    <!-- Controls Panel -->
+    <aside class="controls-panel">
+      <h3 class="panel-title">⚙️ Parameters</h3>
+
+      <div class="control-group">
+        <label>Time Cycles
+          <span class="val-badge" id="val-cycles">15</span>
+        </label>
+        <input type="range" id="ctrl-cycles" min="5" max="50" value="15" />
+        <div class="ctrl-hint">Total simulation cycles</div>
+      </div>
+
+      <div class="control-group">
+        <label>Initial Stem Cells
+          <span class="val-badge" id="val-init">5</span>
+        </label>
+        <input type="range" id="ctrl-init" min="1" max="30" value="5" />
+        <div class="ctrl-hint">Starting stem-cell population</div>
+      </div>
+
+      <div class="control-group">
+        <label>Max Cell Age
+          <span class="val-badge" id="val-age">10</span>
+        </label>
+        <input type="range" id="ctrl-age" min="3" max="25" value="10" />
+        <div class="ctrl-hint">Cycles before natural apoptosis</div>
+      </div>
+
+      <div class="control-group">
+        <label>Division Probability
+          <span class="val-badge" id="val-div">60%</span>
+        </label>
+        <input type="range" id="ctrl-div" min="0" max="100" value="60" />
+        <div class="ctrl-hint">Chance a stem cell divides</div>
+      </div>
+
+      <div class="control-group">
+        <label>Differentiation Probability
+          <span class="val-badge" id="val-diff">50%</span>
+        </label>
+        <input type="range" id="ctrl-diff" min="0" max="100" value="50" />
+        <div class="ctrl-hint">Chance division yields specialised cell</div>
+      </div>
+
+      <div class="control-group">
+        <label>Specialised Death Rate
+          <span class="val-badge" id="val-death">20%</span>
+        </label>
+        <input type="range" id="ctrl-death" min="0" max="80" value="20" />
+        <div class="ctrl-hint">Per-cycle death probability</div>
+      </div>
+
+      <div class="control-group">
+        <label>Growth Factor
+          <span class="val-badge" id="val-gf">1.0×</span>
+        </label>
+        <input type="range" id="ctrl-gf" min="5" max="25" value="10" />
+        <div class="ctrl-hint">Simulates growth-factor treatment</div>
+      </div>
+
+      <div class="toggle-row">
+        <label class="toggle-label">Multi-Lineage Mode</label>
+        <label class="toggle">
+          <input type="checkbox" id="ctrl-multilineage" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <label class="toggle-label">Animate</label>
+        <label class="toggle">
+          <input type="checkbox" id="ctrl-animate" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="control-group">
+        <label>Random Seed
+          <span class="val-badge" id="val-seed">42</span>
+        </label>
+        <input type="range" id="ctrl-seed" min="0" max="999" value="42" />
+        <div class="ctrl-hint">0 = random each run</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-run" id="btn-run">▶ Run Simulation</button>
+        <button class="btn-reset" id="btn-reset">↺ Reset</button>
+      </div>
+
+      <div class="presets-title">Quick Presets</div>
+      <div class="presets">
+        <button class="preset-btn" data-preset="balanced">Balanced</button>
+        <button class="preset-btn" data-preset="aggressive">High Div.</button>
+        <button class="preset-btn" data-preset="conserve">Conserve</button>
+        <button class="preset-btn" data-preset="treatment">Treatment</button>
+      </div>
+    </aside>
+
+    <!-- Charts Area -->
+    <main class="charts-area">
+
+      <div class="chart-tabs">
+        <button class="tab-btn active" data-tab="population">Population</button>
+        <button class="tab-btn" data-tab="ratio">Ratio</button>
+        <button class="tab-btn" data-tab="stacked">Stacked</button>
+        <button class="tab-btn" data-tab="deaths">Deaths</button>
+      </div>
+
+      <!-- Population Chart -->
+      <div class="chart-card active" id="tab-population">
+        <div class="chart-header">
+          <h4>Cell Population Dynamics</h4>
+          <div class="chart-legend">
+            <span class="leg blue">● Stem</span>
+            <span class="leg orange">● Specialised</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chartPopulation"></canvas>
+        </div>
+      </div>
+
+      <!-- Ratio Chart -->
+      <div class="chart-card" id="tab-ratio">
+        <div class="chart-header">
+          <h4>Differentiation Ratio</h4>
+          <div class="chart-legend">
+            <span class="leg green">● Specialised Fraction</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chartRatio"></canvas>
+        </div>
+      </div>
+
+      <!-- Stacked Chart -->
+      <div class="chart-card" id="tab-stacked">
+        <div class="chart-header">
+          <h4>Stacked Population</h4>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chartStacked"></canvas>
+        </div>
+      </div>
+
+      <!-- Deaths Chart -->
+      <div class="chart-card" id="tab-deaths">
+        <div class="chart-header">
+          <h4>Deaths per Cycle</h4>
+          <div class="chart-legend">
+            <span class="leg red">● Deaths</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chartDeaths"></canvas>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="data-table-wrap">
+        <h4 class="table-title">📊 Cycle-by-Cycle Data</h4>
+        <div class="table-scroll">
+          <table class="data-table" id="dataTable">
+            <thead>
+              <tr>
+                <th>Cycle</th>
+                <th>Stem</th>
+                <th>Specialised</th>
+                <th>Total</th>
+                <th>Deaths</th>
+                <th>Diff. Ratio</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr><td colspan="6" class="empty-row">Run the simulation to see data.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="export-row">
+          <button class="btn-export" id="btn-csv">⬇ Export CSV</button>
+          <button class="btn-export" id="btn-json">⬇ Export JSON</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</section>
+
+<!-- ───────────────── BIOLOGY SECTION ───────────────── -->
+<section class="biology-section" id="biology">
+  <div class="section-header">
+    <h2>The Biology Behind the Simulation</h2>
+    <p>Understanding the science of stem cell regeneration.</p>
+  </div>
+
+  <div class="bio-grid">
+    <div class="bio-card">
+      <div class="bio-icon">🔄</div>
+      <h3>Self-Renewal</h3>
+      <p>Stem cells maintain the population by dividing symmetrically — producing two identical daughter stem cells. This is controlled by the <strong>Division Probability</strong> parameter.</p>
+    </div>
+    <div class="bio-card">
+      <div class="bio-icon">🔀</div>
+      <h3>Differentiation</h3>
+      <p>Asymmetric division produces one stem cell and one specialised cell. The <strong>Differentiation Probability</strong> governs how frequently this occurs.</p>
+    </div>
+    <div class="bio-card">
+      <div class="bio-icon">⏳</div>
+      <h3>Cellular Ageing</h3>
+      <p>All cells accumulate age each cycle. Once a cell exceeds its <strong>Max Cell Age</strong>, it undergoes apoptosis (programmed cell death).</p>
+    </div>
+    <div class="bio-card">
+      <div class="bio-icon">💀</div>
+      <h3>Apoptosis</h3>
+      <p>Specialised cells also face stochastic death each cycle. The <strong>Specialised Death Rate</strong> models natural cell turnover in tissues.</p>
+    </div>
+    <div class="bio-card">
+      <div class="bio-icon">🧪</div>
+      <h3>Multi-Lineage</h3>
+      <p>In multi-lineage mode, stem cells can differentiate into <em>Hematopoietic</em>, <em>Neural</em>, or <em>Mesenchymal</em> cells — mirroring real multipotent stem cell behaviour.</p>
+    </div>
+    <div class="bio-card">
+      <div class="bio-icon">💊</div>
+      <h3>Growth Factors</h3>
+      <p>The <strong>Growth Factor</strong> slider simulates therapeutic intervention — amplifying division probability to model the effect of growth-factor treatment on tissue regeneration.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────── ABOUT ───────────────── -->
+<section class="about-section" id="about">
+  <div class="about-inner">
+    <div class="about-text">
+      <div class="about-badge">About This Project</div>
+      <h2>Created by Cherry Computer Ltd.</h2>
+      <p>
+        The Stem Cell Regeneration Simulator is an open-source educational tool
+        developed by <strong>Cherry Computer Ltd.</strong> to bridge the gap
+        between computational modelling and regenerative medicine.
+      </p>
+      <p>
+        Our mission is to make complex biological simulations accessible to
+        students, researchers, and clinicians worldwide — empowering the next
+        generation of biomedical innovation.
+      </p>
+      <div class="about-meta">
+        <div class="meta-item"><span>🏢</span> Cherry Computer Ltd.</div>
+        <div class="meta-item"><span>📅</span> © 2026 All Rights Reserved</div>
+        <div class="meta-item"><span>🔬</span> Regenerative Medicine Tools</div>
+        <div class="meta-item"><span>📄</span> MIT License</div>
+      </div>
+      <a href="https://github.com/Infinite-Networker/Stem-Cell-Regeneration-Simulator" target="_blank" class="btn-primary">View on GitHub ↗</a>
+    </div>
+    <div class="about-card">
+      <div class="code-block">
+        <div class="code-header">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+          <span class="code-title">stem_cell_sim.py</span>
+        </div>
+        <pre><code><span class="c-keyword">from</span> stem_cell_sim <span class="c-keyword">import</span> simulate_regeneration
+
+<span class="c-comment"># Cherry Computer Ltd. — Stem Cell Sim v2.0</span>
+results = simulate_regeneration(
+    cycles=<span class="c-num">20</span>,
+    initial_stem_cells=<span class="c-num">8</span>,
+    division_prob=<span class="c-num">0.65</span>,
+    differentiation_prob=<span class="c-num">0.45</span>,
+    growth_factor=<span class="c-num">1.3</span>,
+    multi_lineage=<span class="c-kw2">True</span>,
+    seed=<span class="c-num">42</span>,
+)
+
+<span class="c-keyword">print</span>(results[<span class="c-str">"Stem"</span>][-<span class="c-num">1</span>])   <span class="c-comment"># final stem count</span></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────── FOOTER ───────────────── -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo">🍒 Cherry Computer Ltd.</span>
+      <span class="footer-tagline">Building Tomorrow's Scientific Tools Today</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/Infinite-Networker/Stem-Cell-Regeneration-Simulator" target="_blank">GitHub</a>
+      <a href="#simulator">Simulator</a>
+      <a href="#biology">Biology</a>
+      <a href="#about">About</a>
+    </div>
+    <div class="footer-copy">
+      © 2026 Cherry Computer Ltd. All rights reserved. · MIT License
+    </div>
+  </div>
+</footer>
+
+<script src="js/simulation.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
