@@ -14,6 +14,7 @@
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-4FC3F7?style=for-the-badge&logo=python&logoColor=white"/>
   <img alt="License" src="https://img.shields.io/badge/License-MIT-69F0AE?style=for-the-badge"/>
   <img alt="Web UI" src="https://img.shields.io/badge/Web_UI-Included-FF8A65?style=for-the-badge"/>
+  [![Made by](https://img.shields.io/badge/Made%20by-Cherry%20Computer%20Ltd.-e8003d?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PC9zdmc+&logoColor=white)](#-cherry-computer-ltd)
 </p>
 
 ---
